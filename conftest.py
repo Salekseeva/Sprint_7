@@ -2,29 +2,9 @@
 
 import pytest
 import random
-import string
-from datetime import datetime, timedelta
 from page_objects.courier_api import CourierAPI
 from page_objects.order_api import OrderAPI
-
-def generate_random_string(length=8):
-    """Генерация случайной строки из букв"""
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for _ in range(length))
-
-def generate_random_address():
-    """Генерация адреса: 20 случайных символов, затем запятая, пробел и от 1 до 3 случайных чисел"""
-    address_part = ''.join(random.choice(string.ascii_letters) for _ in range(20))
-    number_part = ''.join(random.choice(string.digits) for _ in range(random.randint(1, 3)))
-    return f"{address_part}, {number_part}"
-
-def generate_random_phone():
-    """Генерация номера телефона: +7 915 и 7 случайных чисел"""
-    return "+7 915 " + ''.join(random.choice(string.digits) for _ in range(7))
-
-def generate_future_date(days_in_future=3):
-    """Генерация даты, текущая дата + несколько дней"""
-    return (datetime.now() + timedelta(days=days_in_future)).strftime('%Y-%m-%d')
+from helpers import generate_random_string, generate_random_address, generate_random_phone, generate_future_date
 
 @pytest.fixture
 def order_data():
@@ -40,11 +20,6 @@ def order_data():
         "comment": generate_random_string(20)    # строка из 20 случайных букв/цифр/пробелов
     }
 
-@pytest.fixture(scope='function')
-def courier_api():
-    """Фикстура для инициализации объекта CourierAPI"""
-    return CourierAPI()
-
 @pytest.fixture
 def new_courier_data():
     """Фикстура для генерации данных нового курьера"""
@@ -54,7 +29,19 @@ def new_courier_data():
         # Убираем поле firstName, так как оно не обязательно
     }
 
-@pytest.fixture(scope='function')
-def order_api():
-    """Фикстура для инициализации объекта OrderAPI"""
-    return OrderAPI()
+
+@pytest.fixture
+def created_courier(new_courier_data):
+    """Предусловие: создание курьера перед тестом"""
+    courier_api = CourierAPI()
+
+    # Удаляем курьера, если он существует
+    courier_id = courier_api.get_courier_id(new_courier_data["login"])
+    courier_api.delete_courier(courier_id)
+
+    # Создаем курьера
+    response = courier_api.create_courier(**new_courier_data)
+    assert response.status_code == 201, f"Курьер не был создан. Код ответа: {response.status_code}"
+
+    return new_courier_data  # Возвращаем данные для дальнейшего использования в тесте
+

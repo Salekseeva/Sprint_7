@@ -1,18 +1,18 @@
 # page_objects/courier_api.py
 
 import requests
+from config import COURIER_API_URL
 
 class CourierAPI:
-    BASE_URL = "https://qa-scooter.praktikum-services.ru/api/v1/courier"
+    BASE_URL = COURIER_API_URL
 
     def create_courier(self, login, password, firstName=None):
         """Создание курьера с указанными параметрами"""
         payload = {
             "login": login,
             "password": password,
+            "firstName": firstName
         }
-        if firstName:
-            payload["firstName"] = firstName
         return requests.post(self.BASE_URL, json=payload)
 
     def delete_courier(self, courier_id):
