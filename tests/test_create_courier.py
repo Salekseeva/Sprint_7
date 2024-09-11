@@ -2,7 +2,7 @@
 
 import allure
 import pytest
-from helpers import assert_response_status, assert_response_message
+from asserts import assert_response_status, assert_response_message
 from page_objects.courier_api import CourierAPI
 from response_messages import COURIER_CREATE_ERRORS
 

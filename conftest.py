@@ -37,11 +37,14 @@ def created_courier(new_courier_data):
 
     # Удаляем курьера, если он существует
     courier_id = courier_api.get_courier_id(new_courier_data["login"])
-    courier_api.delete_courier(courier_id)
+    if courier_id:
+        courier_api.delete_courier(courier_id)
 
     # Создаем курьера
     response = courier_api.create_courier(**new_courier_data)
-    assert response.status_code == 201, f"Курьер не был создан. Код ответа: {response.status_code}"
 
-    return new_courier_data  # Возвращаем данные для дальнейшего использования в тесте
-
+    # Возвращаем response и данные курьера для использования в тестах
+    return {
+        "response": response,
+        "courier_data": new_courier_data
+    }

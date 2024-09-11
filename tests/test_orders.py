@@ -3,7 +3,7 @@
 import allure
 import pytest
 from test_data import INVALID_COURIER_ID  # Импорт тестовых данных
-from helpers import assert_response_status
+from asserts import assert_response_status
 from page_objects.order_api import OrderAPI
 from response_messages import ORDER_ERRORS
 

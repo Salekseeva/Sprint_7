@@ -4,7 +4,7 @@ import allure
 import pytest
 from test_data import ORDER_COLORS  # Импорт данных о цветах
 from page_objects.order_api import OrderAPI
-from helpers import assert_response_status
+from asserts import assert_response_status
 
 
 #@allure.feature('Создание заказа')

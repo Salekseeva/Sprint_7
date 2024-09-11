@@ -4,7 +4,8 @@ import allure
 import requests
 import pytest
 from page_objects.courier_api import CourierAPI
-from helpers import assert_response_status, assert_response_message, generate_random_string
+from helpers import generate_random_string
+from asserts import assert_response_status, assert_response_message
 from test_data import COURIER_LOGIN_DATA
 from response_messages import COURIER_LOGIN_ERRORS
 
@@ -17,12 +18,17 @@ class TestCourierLoginAPI:
     def test_login_courier_success(self, created_courier):
         """Тест на успешную авторизацию курьера"""
 
-        # Уникальные данные для логина
-        login_data = created_courier
+        # Получаем response и данные курьера из фикстуры
+        courier_response = created_courier["response"]
+        courier_data = created_courier["courier_data"]
+
+        # Проверка, что курьер успешно создан
+        with allure.step("Проверка кода ответа на создание курьера 201"):
+            assert_response_status(courier_response, 201)
 
         # Авторизация курьера с таймаутом
         with allure.step("Отправка запроса на авторизацию"):
-            response = requests.post(f"{CourierAPI.BASE_URL}/login", json=login_data, timeout=10)
+            response = requests.post(f"{CourierAPI.BASE_URL}/login", json=courier_data, timeout=10)
 
         with allure.step("Проверка кода ответа 200"):
             assert_response_status(response, 200, "Курьер не был авотризован")
